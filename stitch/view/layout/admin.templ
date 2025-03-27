@@ -1,0 +1,74 @@
+package layout
+
+templ Admin(params ...string) {
+  @Layout() {
+    <body>
+        <link rel="stylesheet" href="/static/styles/admin/template.css" />
+        <div class="overflow">
+        <header class="surface">
+            <button class="sidebar-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+            </button>
+            <div class="logo">
+                <h1>STICTH</h1>
+            </div>
+        </header>
+        <main>
+          @AdminSideBar()
+          { children... }
+        </main>
+        </div>
+    </body>
+    <script>
+        function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            let computedStyle = window.getComputedStyle(sidebar);
+
+            if (computedStyle.display === "none") {
+                sidebar.style.display = "block";
+            } else {
+                sidebar.style.display = "none";
+            }
+        }
+    </script>
+  }
+}
+
+templ AdminAuth(params ...string) {
+  @Layout() {
+    <body>
+        <link rel="stylesheet" href="/static/styles/admin/template.css" />
+        <div class="overflow">
+        <header class="surface">
+            <div class="logo">
+                <h1>STICTH</h1>
+            </div>
+        </header>
+        <main>{ children... }</main>
+        </div>
+    </body>
+  }
+}
+
+templ AdminSideBar() {
+    <link rel="stylesheet" href="/static/styles/admin/components/dashboardsidebar.css" />
+    <div class="dashboardsidebar" id="sidebar">
+        <div class="places">
+            <ul>
+                <li><a href="/admin/products" hx-boost="true" hx-target="body" >Products</a></li>
+                <li><a href="/admin/stock" hx-boost="true" >Stock</a></li>
+                <ul><details open>
+                    <summary style="font-weight: 500">Order Status</summary>
+                    <ul style="padding-left: 1rem;">
+                        <li><a href="/admin/orders" hx-boost="true">Orders</a></li>
+                        <li><a href="/admin/shipped" hx-boost="true">Shipped</a></li>
+                        <li><a href="/admin/delivered" hx-boost="true">Delivered</a></li>
+                    </ul>
+                </details></ul>
+                <li><a href="/admin/settings" hx-boost="true" >Settings</a></li>
+            </ul>
+            <span style="margin-top: auto"><a href="/admin/change-password" hx-boost="true">Change-password</a><br><a href="/admin/logout">Logout</a></span>
+        </div>
+    </div>
+}

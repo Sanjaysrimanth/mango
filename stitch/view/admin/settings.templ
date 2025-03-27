@@ -1,0 +1,102 @@
+package admin
+
+import (
+    "fmt"
+    "strings"
+    "github.com/FulgurCode/stitch/view/layout"
+)
+
+templ AdminSettings(settings map[string]string) {
+        @layout.Admin() {
+            <link rel="stylesheet" href="/static/styles/admin/settings.css"/>
+            <div class={Container(), innerScroll()}>
+                <h1 style="align-self: start;">Settings</h1>
+                <div class="settings-container">
+                    <div>
+                        @dialog("home-main", "/static/images/home_main_banner", settings["main_title"], settings["main_description"])
+                        <img src="/static/images/home_main_banner"/>
+                        <span>
+                            <p>Homepage banner</p>
+                            <button class="button-primary" onclick={showDialogSettings("home-main")}>Edit</button>
+                        </span>
+                    </div>
+                    <div>
+                        @dialog("hero-one", "/static/images/hero_one_banner", settings["hero_one_title"], settings["hero_one_description"])
+                        <img src="/static/images/hero_one_banner"/>
+                        <span>
+                            <p>Collection Section (1)</p>
+                            <button class="button-primary" onclick={showDialogSettings("hero-one")}>Edit</button>
+                        </span>
+                    </div>
+                    <div>
+                        @dialog("hero-two", "/static/images/hero_two_banner", settings["hero_two_title"], settings["hero_two_description"])
+                        <img src="/static/images/hero_two_banner"/>
+                        <span>
+                            <p>Collection Section (2)</p>
+                            <button class="button-primary" onclick={showDialogSettings("hero-two")}>Edit</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+}
+
+templ dialog(id string, imgUrl string, title string, description string) {
+    <dialog id={ fmt.Sprintf("%s-dialog", id) }>
+        <button onclick={ closeDialogSettings(id) }></button>
+        <form 
+            hx-post={ fmt.Sprintf("/admin/%s", id) }
+            hx-target="body" 
+            enctype="multipart/form-data"
+        >
+            <div>
+                <img src={ imgUrl } id={ fmt.Sprintf("previewImage-%s", id) }/>
+                <label for={ fmt.Sprintf("fileInput-%s", id) } class="button-primary file-input">Change image</label>
+                <input 
+                    type="file" 
+                    name={ fmt.Sprintf("%s_banner", strings.ReplaceAll(id, "-", "_")) }
+                    class="file-input" 
+                    id={ fmt.Sprintf("fileInput-%s", id) }
+                    onchange={ handleFilePreview(id) }
+                    style="display: none;"
+                />
+            </div>
+            <span>
+                <input 
+                    type="text" 
+                    value={ title }
+                    name={ fmt.Sprintf("%s_title", strings.ReplaceAll(id, "-", "_")) }
+                    placeholder="Title"
+                />
+                <textarea 
+                    name={ fmt.Sprintf("%s_description", strings.ReplaceAll(id, "-", "_")) }
+                    placeholder="Description"
+                >{ description }</textarea>
+            </span>
+            <input type="submit" value="save" class="button-primary"/>
+        </form>
+    </dialog>
+}
+
+script showDialogSettings(id string) {
+    const dialog = document.getElementById(`${id}-dialog`);
+    dialog.showModal();
+}
+
+script closeDialogSettings(id string) {
+    const dialog = document.getElementById(`${id}-dialog`);
+    dialog.close();
+}
+script handleFilePreview(id string) {
+    const fileInput = document.getElementById(`fileInput-${id}`);
+    const previewImage = document.getElementById(`previewImage-${id}`);
+    
+    const file = fileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}

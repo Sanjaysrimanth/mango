@@ -1,0 +1,74 @@
+package user
+
+import (
+    "fmt"
+
+    "github.com/FulgurCode/stitch/view/layout"
+    "github.com/FulgurCode/stitch/models"
+)
+
+css Quote() {
+    padding-inline: var(--padding);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+css Container() {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+}
+
+templ Home(products []models.Product,settings map[string]string) {
+    @layout.User() {
+		<link rel="stylesheet" href="/static/styles/user/home.css">
+        <div class={Container()}>
+        <img src={"/static/images/home_main_banner"}/>
+        <div class={Quote(), "surface"}>
+            <h1>{settings["main_title"]}</h1>
+            <a href="/products" hx-boost="true"><button class="button-secondary hidden-swipe" style="width: max-content;">Shop all</button></a>
+            <p style="max-width: 800px" class="hidden">{settings["main_description"]}</p>
+        </div>
+        <div class="product-container">
+            for i := 0; i < len(products) && i < 9;i++ {
+              @ProductCard(products[i])
+            }
+        </div>
+        <a href="/products" hx-boost="true"><button class="button-primary hidden-swipe" style="margin-bottom: 5rem; width: max-content;">View all ></button></a>
+        <div class="present-container">
+            @presentCard("/static/images/hero_one_banner", settings["hero_one_title"], settings["hero_one_description"], "/comming-soon")
+            @presentCard("/static/images/hero_two_banner", settings["hero_two_title"], settings["hero_two_description"], "/comming-soon")
+        </div>
+        </div>
+    }
+}
+
+templ ProductCard(product models.Product) {
+    <a href={templ.URL(fmt.Sprintf("/item/%s",product.Id))} hx-boost="true" style="color: inherit; text-decoration: none"  class="hidden">
+        <div class="product-card">
+            <img src={"/static/images/"+product.Id+"-main"}>
+            <div>
+                <p class="name">{product.Name}</p>
+                <h3 class="price">&#8360;. {fmt.Sprintf("%d",product.Price)}</h3>
+            </div>
+        </div>
+    </a>
+}
+
+templ presentCard(imageUrl string, title string, description string, productUrl string) {
+    <div class="present-card">
+        <img src={imageUrl} class="hidden"/>
+        <div class="surface">
+            <h1 class="hidden-swipe">{title}</h1>
+            <p class="hidden">{description}</p>
+            <a href={templ.SafeURL(productUrl)} hx-boost="true"><button class="button-secondary hidden-swipe" style="margin: 1rem;">Explore</button></a>
+        </div>
+    </div>
+}

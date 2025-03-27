@@ -1,0 +1,101 @@
+package admin
+
+import (
+    "fmt"
+
+    "github.com/FulgurCode/stitch/view/layout"
+    "github.com/FulgurCode/stitch/models"
+)
+
+templ AdminItem(product models.Product) {
+    @layout.Admin() {
+        <link rel="stylesheet" href="/static/styles/admin/item.css"/>
+        <script src="/static/scripts/image-input.js" defer></script>
+        <div class={Container(), innerScroll()}>
+            <h1 style="align-self: start;">Item</h1>
+            <div class="item-container">
+                <form class="description-container" hx-put={fmt.Sprintf("/admin/product/%s",product.Id)} hx-target="body" enctype="multipart/form-data">
+                // <div class="image">
+                //     <img src="https://picsum.photos/60/100"/>
+                //     <img src="https://picsum.photos/60/110"/>
+                //     <span onclick="document.getElementById('fileInput').click()">
+                //         <input type="file" id="fileInput" accept="image/*" style="display: none">
+                //         <span>+</span>
+                //     </span>
+                // </div>
+                <div class="image">
+                    <p class="no-line-height">Main Image:</p>
+                    <section class="image-section" id="mainImageSection">
+                        <img src={"/static/images/"+product.Id+"-main"} alt="Loading..">
+                        <label for="fileInput_main" class="upload-button">
+                            <input type="file" id="fileInput_main" accept="image/*" style="position:absolute; opacity: 0" name="main-image">
+                            <span>+</span>
+                        </label>
+                    </section>
+                    <p class="no-line-height">Additional Images (Max 9):</p>
+                    <section class="image-section" id="moreImagesSection">
+                        for i := 1; i <= 9; i++ {
+                            <img 
+                            src={fmt.Sprintf("/static/images/%s-%d", product.Id, i)} 
+                            alt="Loading.." 
+                            onerror="this.style.display='none';"
+                            >
+                        }
+                        <label for="fileInput_more" class="upload-button" id="moreImagesLabel" name="">
+                            <input type="file" id="fileInput_more" accept="image/*" style="position:absolute; opacity: 0;" name="images" multiple>
+                            <span>+</span>
+                        </label>
+                    </section>
+                    <div id="imageCounter">0 / 9 images</div>
+                </div>
+
+                <div class="description-container">
+                    <p class="no-line-height">Title:</p>
+                    <input type="text" style="font-weight: 600; font-size: 1.5rem;" value={product.Name} name="name"/>
+                    <span style="gap: 2px;">
+                        <p class="no-line-height">Price:</p>
+                        <p style="margin: 0;"><input type="number" name="price" value={fmt.Sprintf("%d",product.Price)} placeholder="price"/> &#8360;.</p>
+                        <p class="no-line-height">Description:</p>
+                        <textarea name="description" placeholder="Description" id="auto-expand-textarea" value={product.Description}>{product.Description}</textarea>
+                        <p class="no-line-height">Include Size:</p>
+                    </span>
+                    <div class="size-group">
+                        <div class="checkbox-button">
+                            <input type="checkbox" id="small-size" name="size" value="S">
+                            <label for="small-size">S</label>
+                        </div>
+                        <div class="checkbox-button">
+                            <input type="checkbox" id="medium-size" name="size" value="M">
+                            <label for="medium-size">M</label>
+                        </div>
+                        <div class="checkbox-button">
+                            <input type="checkbox" id="large-size" name="size" value="L">
+                            <label for="large-size">L</label>
+                        </div>
+                        <div class="checkbox-button">
+                            <input type="checkbox" id="extra-large-size" name="size" value="XL">
+                            <label for="extra-large-size">XL</label>
+                        </div>
+                    </div>
+                    <button class="button-primary" style="margin-top: var(--padding-inner)">Save</button>
+                </div>
+
+              </form>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('auto-expand-textarea');
+
+            const adjustHeight = () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = `${textarea.scrollHeight}px`;
+            };
+
+            textarea.addEventListener('input', adjustHeight);
+
+            adjustHeight();
+        });
+        </script>
+    }
+}

@@ -1,0 +1,95 @@
+package admin
+
+import (
+    "fmt"
+    "strconv"
+
+    "github.com/FulgurCode/stitch/view/layout"
+    "github.com/FulgurCode/stitch/models"
+)
+
+css innerScroll() {
+    padding: var(--padding);
+    padding-top: var(--padding-inner);
+    overflow-y: auto;
+}
+
+templ AdminProducts(products []models.Product) {
+    @layout.Admin() {
+        <link rel="stylesheet" href="/static/styles/admin/products.css"/>
+        <div class={Container(), innerScroll()}>
+            <div class="header">
+                <h1 style="align-self: start">Products</h1>
+                <a href="/admin/add-product" hx-boost="true"><button class="button-primary">Add New Product</button></a>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search...">
+            <table id="myTable">
+                <tr> <th ></th> <th>Name</th> <th>Price</th> <th>Description</th> <th> </th> </tr>
+                if len(products) == 0{
+                    <tr><td colspan="5" style="text-align: center; font-style: italic;">Empty</td></tr>
+                } else {
+                    for _, product := range products {
+                        @ProductsCard(product)
+                    }
+                }
+            </table>
+            <div id="noResults" style="display: none; font-style: italic;">No matching results found.</div>
+        </div>
+        <script>
+            function searchTable() {
+                var input, filter, table, tr, td, i, j, txtValue;
+                input = document.getElementById("searchInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("myTable");
+                tr = table.getElementsByTagName("tr");
+                var noResults = document.getElementById("noResults");
+                var visibleCount = 0;
+
+                for (i = 1; i < tr.length; i++) {
+                    var visible = false;
+                    td = tr[i].getElementsByTagName("td");
+                    for (j = 1; j < td.length - 1; j++) {
+                        if (td[j]) {
+                            txtValue = td[j].textContent || td[j].innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                visible = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (visible) {
+                        tr[i].style.display = "";
+                        visibleCount++;
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+
+                if (visibleCount === 0) {
+                    noResults.style.display = "block";
+                    table.style.display = "none";
+                } else {
+                    noResults.style.display = "none";
+                    table.style.display = "table";
+                }
+            }
+
+            document.getElementById("searchInput").addEventListener("keyup", searchTable);
+        </script>
+    }
+}
+
+templ ProductsCard(product models.Product) {
+    <tr>
+        <td ><span ><img src={"/static/images/"+product.Id+"-main"} /></span></td>
+        <td data-cell="Name:">{product.Name}</td>
+        <td data-cell="Price:">{strconv.Itoa(product.Price)}&nbsp;&#8360;</td>
+        <td data-cell="Description:" style="width: 100%"><p>{product.Description}</p></td>
+        <td >
+            <div >
+                <a href={templ.URL(fmt.Sprintf("/admin/item/%s", product.Id))} hx-boost="true"><button class="button-primary">Edit</button></a>
+                <button class="button-secondary" hx-delete={fmt.Sprintf("/admin/product/%s",product.Id)} hx-swap="outerHTML swap:1s" hx-target="closest tr" >Delete</button>
+            </div>
+        </td>
+    </tr>
+}

@@ -1,0 +1,62 @@
+package user
+
+import (
+    "fmt"
+    "strings"
+
+    "github.com/FulgurCode/stitch/view/layout"
+    "github.com/FulgurCode/stitch/models"
+)
+
+
+templ Cart(products []models.Product) {
+    @layout.User() {
+        <link rel="stylesheet" href="/static/styles/user/cart.css"/>
+        <div id="outer-container" class={Container()} style="padding: var(--padding); box-sizing: border-box; margin-top: 1rem">
+                    if len(products) == 0 {
+                        <div>
+                            <i>Your Cart is Empty</i>
+                        </div>
+                    } else {
+                        <span style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="orders-container">
+                                for _,product := range products {
+                                    @CartCard(product)
+                                }
+                            </div>
+                            <button class="button-primary" style="align-self:last baseline;" hx-get="/cart/order" hx-target="body" hx-push-url="/cart/order" >Buy All</button>
+                        </span>
+                    }
+                
+        </div>
+        @checkEmpty()
+    }
+}
+
+templ CartCard(product models.Product) {
+    <div class="orders" id={fmt.Sprintf("%s", product.Id)} data-product-id={product.Id}>
+        <img src={fmt.Sprintf("/static/images/%s-main",product.Id)}/>
+        <div>
+            Product name: {product.Name}<br/>
+            Price: &#8360;. {fmt.Sprintf("%d",product.Price)}
+            Size: {strings.ToUpper(product.Size)}
+        </div>
+        <div>
+            <button class="button-primary" hx-get={fmt.Sprintf("/item/%s", product.Id)} hx-target="body" hx-push-url={fmt.Sprintf("/item/%s", product.Id)} >View Product</button>
+            <button 
+                hx-delete={fmt.Sprintf("/delete-cart/%s",product.Id)} 
+                hx-swap="outerHTML" hx-target={fmt.Sprintf("[data-product-id='%s']", product.Id)} 
+                class="button-secondary"
+                hx-on::before-request="showToast('Product removed from the cart', 'success')"
+                >Remove Product</button>
+        </div>
+    </div>
+}
+
+script checkEmpty() {
+    document.addEventListener("htmx:afterRequest", function (event) {
+        if(!document.querySelector('.orders') && document.querySelector('#outer-container')) {
+            document.querySelector('#outer-container').innerHTML = '<div><i>Your Cart is Empty</i></div>';
+        }
+    });
+}

@@ -1,0 +1,18 @@
+package user
+
+import (
+    "github.com/FulgurCode/stitch/view/layout"
+    "github.com/FulgurCode/stitch/models"
+)
+
+templ Products(products []models.Product) {
+    @layout.User() {
+        <div class={Container()}>
+        <div class="product-container">
+            for _,product := range products {
+                @ProductCard(product)
+            }
+        </div>
+        </div>
+    }
+}

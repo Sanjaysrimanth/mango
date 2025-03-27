@@ -1,0 +1,72 @@
+package layout
+
+templ User() {
+  @Layout() {
+    <link rel="stylesheet" href="/static/styles/user/template.css" />
+    <link rel="stylesheet" href="/static/styles/user/search.css">
+    <script src="/static/scripts/scroll_animation.js" defer/>
+    <body>
+        <div class="overflow">
+        <header class="surface" style="position: relative;">
+            <div class="logo">
+
+                <input type="checkbox" id="searchCheckbox"/>
+                <label for="searchCheckbox">
+                    <img src="/static/icons/search.svg" alt="Search"/>
+                </label>
+                
+                <div id="searchContainer" class="searchContainer">
+                    <form hx-get="/products" hx-target="body" hx-push-url="true">
+                        <input type="text" placeholder="Search..." list="queries" name="search"/>
+                        <datalist id="queries"> // Insert all your queries from db here
+                            <option value="shirt" />
+                            <option value="t-shirt" />
+                            <option value="pants" />
+                        </datalist>
+                        <input type="submit" class="button-primary" value="Search"/>
+                    </form>
+                    <label for="searchCheckbox">
+                        <img src="/static/icons/close.svg" alt="Close"/>
+                    </label>
+                </div>
+
+                // <a href="/products/search" hx-boost="true"><img src="/static/icons/search.svg"/></a>
+                <h1>STICTH</h1>
+                <a href="/cart" hx-boost="true"><img src="/static/icons/cart.svg"/></a>
+            </div>
+            <ul>
+                <li><a href="/" hx-boost="true">Home</a></li>
+                <li><a href="/products" hx-boost="true">All</a></li>
+                // <li>Shop</li>
+                // <li>Acessories</li>
+                <li><a href="/collections" hx-boost="true">Collections</a></li>
+                <li><a href="/about" hx-boost="true">About us</a></li>
+            </ul>
+        </header>
+        <main>{ children... }</main>
+        <footer class="surface">
+            <div>
+                <div class="policies">
+                    <h3>Policies</h3>
+                    <ul>
+                        <li><a href="mailto:mail@gmail.com">Contact us</a></li>
+                        // <li>Refund Policy</li>
+                        // <li>Shipping Policy</li>
+                        // <li>Privacy Policy</li>
+                    </ul>
+                </div>
+                <div class="logo">
+                    <h1>STICTH</h1>
+                </div>
+                <div class="contacts">
+                    <h3>Contact us</h3>
+                    <ul>
+                        <li>+91 8353692784</li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+        </div>
+    </body>
+  }
+}
